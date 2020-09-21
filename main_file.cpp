@@ -161,11 +161,11 @@ GLuint readTexture(const char* filename) {
 void initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który należy wykonać raz, na początku programu************
 	//MK
-	//initial_positions.push_back(glm::vec3(4.35f, 5.5f, 4.2f));
-	//initial_positions.push_back(glm::vec3(3.35f, 5.5f, -4.6f));
-	//initial_positions.push_back(glm::vec3(-3.35f, 5.5f, 3.6f));
-	//initial_positions.push_back(glm::vec3(-4.35f, 5.5f, -3.6f));
-	//
+	initial_positions.push_back(glm::vec3(4.35f, 5.5f, 4.2f));
+	initial_positions.push_back(glm::vec3(3.35f, 5.5f, -4.6f));
+	initial_positions.push_back(glm::vec3(-3.35f, 5.5f, 3.6f));
+	initial_positions.push_back(glm::vec3(1.35f, 5.5f, -3.6f));
+	//.
 	glClearColor(0,0,0,1);
 	glEnable(GL_DEPTH_TEST);
 	glfwSetWindowSizeCallback(window,windowResizeCallback);
@@ -284,15 +284,17 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 	}
 	for (int i = 0; i < balls.size(); i++) {
 		glm::mat4 Mloop = glm::mat4(1.0f);
-		//for (int j = 0; j < balls.size(); j++) {
-		//	if (glm::distance(balls[i].position, balls[j].position) <= balls[i].radius + balls[j].radius
-		//		&& i != j ) {
-		//		balls[i].update_positon_ball_collision(deltaTime, balls[j].position, balls[j].direction);
-		//		balls[j].update_positon_ball_collision(deltaTime, balls[i].position, balls[i].direction);
-		//		break;
-		//	}
-		//}
-		bool touch_map_flag = false;
+		bool touch_map = false;
+		for (int j = 0; j < balls.size(); j++) {
+			if (glm::distance(balls[i].position, balls[j].position) <= (balls[i].radius + balls[j].radius) * 0.8f
+				&& i != j ) {
+				balls[i].update_positon_ball_collision(deltaTime, balls[j].position, balls[j].speed, map_translate_y, map_flatness);
+				balls[j].update_positon_ball_collision(deltaTime, balls[i].position, balls[i].speed, map_translate_y, map_flatness);
+				break;
+				printf("Collision!\n");
+				touch_map = true;
+			}
+		}
 		for (int j = 0; j < mapVertexCount*4; j+=4) {
 			glm::vec3 tempVertex = glm::vec3(mapVertices[j], mapVertices[j + 1] + map_translate_y, mapVertices[j + 2]);
 			//printf("%f -- %f / %f / %f\n", glm::distance(balls[i].position, tempVertex), tempVertex.x, tempVertex.y, tempVertex.z);
@@ -300,7 +302,7 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 			if (glm::distance(balls[i].position, tempVertex)
 				<= balls[i].radius) {
 				balls[i].update_positon_map_touch(deltaTime, tempVertex, map_flatness, map_translate_y);
-				touch_map_flag = true;
+				touch_map = true;
 				//printf("Should've bounce!\n");
 			}
 			temp[i] = glm::distance(balls[i].position, tempVertex);
@@ -310,8 +312,10 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 			}
 			
 		}
-		if(!touch_map_flag) balls[i].update_position(deltaTime);
+		if(!touch_map) balls[i].update_position(deltaTime);
 		Mloop = glm::translate(Mloop, balls[i].position);
+		Mloop = glm::rotate(Mloop, balls[i].rotation_speed.x, glm::vec3(1.0f, 0.0f, 0.0f));
+		Mloop = glm::rotate(Mloop, balls[i].rotation_speed.z, glm::vec3(0.0f, 0.0f, 1.0f));
 		loadModel(Mloop, vertices, colors, normals, texCoords, vertexCount, tex2, false);
 		if (time_flag == true) {
 			//printf("ball nr: %d; dist: %f; radius: %f\n",i, min_temp[i], balls[i].radius);
@@ -328,7 +332,7 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 int main(void)
 {
 	float temp_input_x, temp_input_y, temp_input_z;
-	for (int i = 0; i < 4; i++) {
+	/*for (int i = 0; i < 4; i++) {
 		printf("Podaj wspolrzedne do upuszczenia kulki\nx: ");
 		std::cin >> temp_input_x;
 		printf("\ny: ");
@@ -340,7 +344,7 @@ int main(void)
 		initial_positions[i].x += 0.34f;
 		initial_positions[i].y += 0.34f;
 		initial_positions[i].z += 0.34f;
-	}
+	}*/
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
 
 	glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów

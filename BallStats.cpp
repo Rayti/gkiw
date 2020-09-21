@@ -4,6 +4,7 @@
 
 #include "BallStats.hpp"
 #include "mapGenerator.h"
+#include "constants.h"
 
 
 void BallStats::update_position(float deltaTime) {
@@ -23,7 +24,7 @@ void BallStats::update_positon_map_touch(float deltaTime, glm::vec3 mapVertex,
 		timer = 0;
 		printf("%f %f %f\n", speed.x, speed.y, speed.z);
 	}
-	position = position + speed * deltaTime;
+	position = position +  speed * deltaTime;
 	position.y = radius * 0.7 + map_translate_y + mapGenerator::getMapHeight(position.z, position.x, flatness);*/
 	glm::vec3 right = glm::vec3(position.x + delta_dist, 0.0f, position.z);
 	right.y = mapGenerator::getMapHeight(right.x, right.z, flatness);
@@ -40,17 +41,47 @@ void BallStats::update_positon_map_touch(float deltaTime, glm::vec3 mapVertex,
 	position = position + deltaTime * speed;
 	position.y =map_translate_y + radius * 0.7f + mapGenerator::getMapHeight(position.x, position.z, flatness);
 	//printf("x_diff: %f; y_diff: %f\n", x_diff, z_diff);
-
+	rotation_speed = speed * deltaTime * 250.0f;
 }
 
-void BallStats::update_positon_ball_collision(float deltaTime, glm::vec3 otherBallVertex, glm::vec3 otherBallDirection) {
+
+
+void BallStats::update_positon_ball_collision(float deltaTime, glm::vec3 otherBallPosition, glm::vec3 otherBallSpeed,
+	float map_translate_y, float flatness) {
+	glm::vec3 temp = position - otherBallPosition;
+	glm::vec3 temp_this_speed = speed;
+	if (temp.x < temp.z) {
+		speed.z *= -1;
+	}
+	else {
+		speed.x *= -1;
+	}
+	//speed = glm::normalize(speed);
+	//speed *= glm::length(otherBallSpeed);
+
+	//temp = otherBallPosition - position;
+	//if (temp.x < temp.z) {
+	//	otherBallSpeed.z *= -1;
+	//}
+	//else {
+	//	otherBallSpeed.x *= -1;
+	//}
+	//otherBallSpeed = glm::normalize(otherBallPosition);
+	//otherBallSpeed *= glm::length(temp_this_speed);
+
+	position = position + speed * deltaTime;
+	position.y = map_translate_y + radius * 0.7f + mapGenerator::getMapHeight(position.x, position.z, flatness);
+	//otherBallPosition = otherBallPosition + otherBallSpeed * deltaTime;
+	//otherBallPosition.y = map_translate_y + radius * 0.7f + mapGenerator::getMapHeight(
+	//	otherBallPosition.x, otherBallPosition.z, flatness
+	//);
 
 }
 
 BallStats::BallStats(glm::vec3 position)
 {
 	timer = 0.0f;
-
+	rotation_speed = glm::vec3(0.0f, 0.0f, 0.0f);
 	radius = 1.0f;
 	drop_speed = 1.5f;
 	speed = glm::vec3(0.0f, 0.0f, 0.0f);
