@@ -34,7 +34,7 @@ mapGenerator::mapGenerator(float flatness, int size)
 
 }
 //MK
-float mapGenerator::getMapHeight(float x, float z, float flatness2) {
+float mapGenerator::getMapHeight(float z, float x, float flatness2) {
 	return 20 * flatness2 * (2 * cos(0.3 * x) * cos(0.3 * z));
 }
 //.

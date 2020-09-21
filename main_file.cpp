@@ -66,7 +66,7 @@ GLuint tex2; //metal
 GLuint tex3; //lightSource
 
 const int balls_amount = 4;
-std::vector <glm::vec3> initial_postions;
+std::vector <glm::vec3> initial_positions;
 std::vector <BallStats> balls;
 
 //Map
@@ -161,10 +161,10 @@ GLuint readTexture(const char* filename) {
 void initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który należy wykonać raz, na początku programu************
 	//MK
-	initial_postions.push_back(glm::vec3(4.5f, 5.5f, 4.5f));
-	initial_postions.push_back(glm::vec3(3.5f, 5.5f, -4.5f));
-	initial_postions.push_back(glm::vec3(-3.5f, 5.5f, 3.5f));
-	initial_postions.push_back(glm::vec3(-4.5f, 5.5f, -3.5f));
+	//initial_positions.push_back(glm::vec3(4.35f, 5.5f, 4.2f));
+	//initial_positions.push_back(glm::vec3(3.35f, 5.5f, -4.6f));
+	//initial_positions.push_back(glm::vec3(-3.35f, 5.5f, 3.6f));
+	//initial_positions.push_back(glm::vec3(-4.35f, 5.5f, -3.6f));
 	//
 	glClearColor(0,0,0,1);
 	glEnable(GL_DEPTH_TEST);
@@ -184,7 +184,7 @@ void initOpenGLProgram(GLFWwindow* window) {
 
 	sp=new ShaderProgram("v_simplest.glsl",NULL,"f_simplest.glsl");
 	for (int i = 0; i < balls_amount; i++) {
-		balls.push_back(BallStats(initial_postions[i]));
+		balls.push_back(BallStats(initial_positions[i]));
 	}
 }
 
@@ -327,6 +327,20 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 
 int main(void)
 {
+	float temp_input_x, temp_input_y, temp_input_z;
+	for (int i = 0; i < 4; i++) {
+		printf("Podaj wspolrzedne do upuszczenia kulki\nx: ");
+		std::cin >> temp_input_x;
+		printf("\ny: ");
+		std::cin >> temp_input_y;
+		printf("\nz: ");
+		std::cin >> temp_input_z;
+		printf("\n");
+		initial_positions.push_back(glm::vec3(temp_input_x, temp_input_y, temp_input_z));
+		initial_positions[i].x += 0.34f;
+		initial_positions[i].y += 0.34f;
+		initial_positions[i].z += 0.34f;
+	}
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
 
 	glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów
