@@ -12,14 +12,14 @@ void BallStats::update_position(float deltaTime) {
 }
 
 void BallStats::update_positon_map_touch(float deltaTime, glm::vec3 mapVertex){
-	glm::vec3 temp_k = position - mapVertex;
-	glm::vec3 temp_w = direction;
-	glm::vec3 temp_m = temp_k + temp_w;
-	temp_m = glm::normalize(temp_m);
-	glm::vec3 speed_vertex = a * temp_m + speed * temp_m;
-	float cos_alpha = (temp_w.x * speed * temp_k.x +
-		temp_w.y * temp_k.y +
-		temp_w.z * temp_k.z) / (glm::length(temp_w) * glm::length(temp_k));
+	//glm::vec3 temp_k = position - mapVertex;
+	//glm::vec3 temp_w = direction;
+	//glm::vec3 temp_m = temp_k + temp_w;
+	//temp_m = glm::normalize(temp_m);
+	//glm::vec3 speed_vertex = a * temp_m + speed * temp_m;
+	//float cos_alpha = (temp_w.x * speed * temp_k.x +
+	//	temp_w.y * temp_k.y +
+	//	temp_w.z * temp_k.z) / (glm::length(temp_w) * glm::length(temp_k));
 
 
 
@@ -36,7 +36,7 @@ void BallStats::update_positon_ball_collision(float deltaTime, glm::vec3 otherBa
 
 BallStats::BallStats(glm::vec3 position)
 {
-	radius = 0.008f;
+	radius = 1.0f;
 	speed_x = 0.0f;
 	speed_y = 0.0f;
 	speed_z = 0.0f;

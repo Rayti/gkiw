@@ -46,6 +46,7 @@ float aspectRatio=1;
 float deltaTime = 0.0f;
 
 const int mapSize = 60;
+float map_translate_y = -3.0f;
 
 
 //MK
@@ -56,7 +57,7 @@ int window_y = 1000;
 ShaderProgram *sp;
 Camera camera = Camera();
 Mouse mouse = Mouse();
-mapGenerator map = mapGenerator(0.1, mapSize);
+mapGenerator map = mapGenerator(0.05, mapSize);
 
 GLuint tex0; //grass
 GLuint tex1; //grassSpecularMap
@@ -92,7 +93,7 @@ float* vertices;
 float* normals;
 float* texCoords;
 float* colors;
-int vertexCount = loadOBJ("models\\sphere7.obj",
+int vertexCount = loadOBJ("models\\sphere12.obj",
 	vertices, texCoords, normals, colors);
 
 //Procedura obsługi błędów
@@ -230,6 +231,11 @@ void loadModel(glm::mat4 M, float* verticesLocal, float* colorsLocal, float* nor
 }
 
 float speed_y = 2.0f;
+float time_meter = 0.0f;
+float min_temp[4] = { 50.0f, 50.0f, 50.0f, 50.0f };
+float temp[4];
+bool time_flag = false;
+glm::vec3 more_temp_vertex;
 
 //Procedura rysująca zawartość sceny
 void drawScene(GLFWwindow* window, float deltaTime) {
@@ -256,7 +262,7 @@ void drawScene(GLFWwindow* window, float deltaTime) {
     glUniformMatrix4fv(sp->u("V"),1,false,glm::value_ptr(camera.getViewMatrix(deltaTime)));
 	
 	glm::mat4 M = glm::mat4(1.0f);
-	glm::mat4 M_map = glm::translate(M, glm::vec3(0.0f, -1.0f, 0.0f));
+	glm::mat4 M_map = glm::translate(M, glm::vec3(0.0f, map_translate_y, 0.0f));
 	loadModel(M_map, mapVertices, mapColors, mapNormals, mapTexCoords, mapVertexCount, tex0, true);
 
 	float lampScale = 3.0f;
@@ -268,8 +274,12 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 
 	//glm::mat4 M = glm::mat4(1.0f);
 	//loadModel(M, vertices, colors, normals, texCoords, vertexCount);
-	bool touch_map_flag = false;
 
+	time_meter += deltaTime;
+	if (time_meter >= 0.5f) {
+		time_flag = true;
+		time_meter = 0.0f;
+	}
 	for (int i = 0; i < balls.size(); i++) {
 		glm::mat4 Mloop = glm::mat4(1.0f);
 		//for (int j = 0; j < balls.size(); j++) {
@@ -280,19 +290,34 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 		//		break;
 		//	}
 		//}
+		bool touch_map_flag = false;
 		for (int j = 0; j < mapVertexCount*4; j+=4) {
-			glm::vec3 tempVertex = glm::vec3(mapVertices[j], mapVertices[j + 1], mapVertices[j + 2]);
+			glm::vec3 tempVertex = glm::vec3(mapVertices[j], mapVertices[j + 1] + map_translate_y, mapVertices[j + 2]);
+			//printf("%f -- %f / %f / %f\n", glm::distance(balls[i].position, tempVertex), tempVertex.x, tempVertex.y, tempVertex.z);
+			//printf("%f / %f / %f\n", mapNormals[j], mapNormals[j + 1], mapNormals[j + 2], mapNormals[j + 3]);
 			if (glm::distance(balls[i].position, tempVertex)
 				<= balls[i].radius) {
 				balls[i].update_positon_map_touch(deltaTime, tempVertex);
 				touch_map_flag = true;
 				//printf("Should've bounce!\n");
 			}
+			temp[i] = glm::distance(balls[i].position, tempVertex);
+			if (temp[i] < min_temp[i]) {
+				min_temp[i] = temp[i];
+				more_temp_vertex = tempVertex;
+			}
+			
 		}
 		if(!touch_map_flag) balls[i].update_position(deltaTime);
 		Mloop = glm::translate(Mloop, balls[i].position);
 		loadModel(Mloop, vertices, colors, normals, texCoords, vertexCount, tex2, false);
+		if (time_flag == true) {
+			//printf("ball nr: %d; dist: %f; radius: %f\n",i, min_temp[i], balls[i].radius);
+			//printf("v: %f / %f / %f\n", more_temp_vertex.x, more_temp_vertex.y, more_temp_vertex.z);
+			//printf("b: %f / %f / %f\n", balls[i].position.x, balls[i].position.y, balls[i].position.z);
+		}
 	}
+	time_flag = false;
 
     glfwSwapBuffers(window); //Przerzuć tylny bufor na przedni
 }
