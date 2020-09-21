@@ -33,6 +33,11 @@ mapGenerator::mapGenerator(float flatness, int size)
 	calculateMapTexCoords();
 
 }
+//MK
+float mapGenerator::getMapHeight(float x, float z, float flatness2) {
+	return 20 * flatness2 * (2 * cos(0.3 * x) * cos(0.3 * z));
+}
+//.
 
 void mapGenerator::calculateMapHeights() {
 
@@ -61,33 +66,39 @@ void mapGenerator::calculateMapVertices() {
 
 			//first triangle
 			mapVertices[index++] = x - offsetX;
-			mapVertices[index++] = mapHeights[z][x];
+			/*mapVertices[index++] = mapHeights[z][x];*/
+			mapVertices[index++] = getMapHeight(z - offsetZ, x - offsetX, flatness);
 			mapVertices[index++] = z - offsetZ;
 			mapVertices[index++] = 1.0f;
-
+			//
 			mapVertices[index++] = x - offsetX + 1;
-			mapVertices[index++] = mapHeights[z][x + 1];
+			/*mapVertices[index++] = mapHeights[z][x + 1];*/
+			mapVertices[index++] = getMapHeight(z - offsetZ, x + 1 - offsetX, flatness);
 			mapVertices[index++] = z - offsetZ;
 			mapVertices[index++] = 1.0f;
-
+			//
 			mapVertices[index++] = x - offsetX;
-			mapVertices[index++] = mapHeights[z + 1][x];
+			//mapVertices[index++] = mapHeights[z + 1][x];
+			mapVertices[index++] = getMapHeight(z + 1 - offsetZ, x - offsetX, flatness);
 			mapVertices[index++] = z - offsetZ + 1;
 			mapVertices[index++] = 1.0f;
 
 			//second triangle
 			mapVertices[index++] = x - offsetX + 1;
-			mapVertices[index++] = mapHeights[z][x + 1];
+			//mapVertices[index++] = mapHeights[z][x + 1];
+			mapVertices[index++] = getMapHeight(z- offsetZ, x - offsetX + 1, flatness);
 			mapVertices[index++] = z - offsetZ;
 			mapVertices[index++] = 1.0f;
-
+			//
 			mapVertices[index++] = x - offsetX;
-			mapVertices[index++] = mapHeights[z + 1][x];
+			//mapVertices[index++] = mapHeights[z + 1][x];
+			mapVertices[index++] = getMapHeight(z - offsetZ + 1, x - offsetX, flatness);
 			mapVertices[index++] = z - offsetZ + 1;
 			mapVertices[index++] = 1.0f;
-
+			//
 			mapVertices[index++] = x - offsetX + 1;
-			mapVertices[index++] = mapHeights[z + 1][x + 1];
+			//mapVertices[index++] = mapHeights[z + 1][x + 1];
+			mapVertices[index++] = getMapHeight(z - offsetZ + 1, x - offsetX + 1, flatness);
 			mapVertices[index++] = z - offsetZ + 1;
 			mapVertices[index++] = 1.0f;
 		}

@@ -37,6 +37,7 @@ public:
 	float* getMapTexCoords() { return texCoords; }
 	float** getMapHeights() { return mapHeights; }
 	int getMapVertexCount() { return verticesCount; }
+	static float getMapHeight(float x, float z, float flatness2);
 
 
 };

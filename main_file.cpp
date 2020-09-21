@@ -47,6 +47,7 @@ float deltaTime = 0.0f;
 
 const int mapSize = 60;
 float map_translate_y = -3.0f;
+float map_flatness = 0.05;
 
 
 //MK
@@ -57,7 +58,7 @@ int window_y = 1000;
 ShaderProgram *sp;
 Camera camera = Camera();
 Mouse mouse = Mouse();
-mapGenerator map = mapGenerator(0.05, mapSize);
+mapGenerator map = mapGenerator(map_flatness, mapSize);
 
 GLuint tex0; //grass
 GLuint tex1; //grassSpecularMap
@@ -74,6 +75,7 @@ float* mapNormals = map.getMapNormals();
 float* mapColors = map.getMapColors();
 float* mapTexCoords = map.getMapTexCoords();
 int mapVertexCount = map.getMapVertexCount();
+float** mapHeight = map.getMapHeights();
 
 //Lamp
 float* lampVertices;
@@ -159,10 +161,10 @@ GLuint readTexture(const char* filename) {
 void initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który należy wykonać raz, na początku programu************
 	//MK
-	initial_postions.push_back(glm::vec3(4, 5, 4));
-	initial_postions.push_back(glm::vec3(3, 5, -4));
-	initial_postions.push_back(glm::vec3(-3, 5, 3));
-	initial_postions.push_back(glm::vec3(-4, 5, -3));
+	initial_postions.push_back(glm::vec3(4.5f, 5.5f, 4.5f));
+	initial_postions.push_back(glm::vec3(3.5f, 5.5f, -4.5f));
+	initial_postions.push_back(glm::vec3(-3.5f, 5.5f, 3.5f));
+	initial_postions.push_back(glm::vec3(-4.5f, 5.5f, -3.5f));
 	//
 	glClearColor(0,0,0,1);
 	glEnable(GL_DEPTH_TEST);
@@ -297,7 +299,7 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 			//printf("%f / %f / %f\n", mapNormals[j], mapNormals[j + 1], mapNormals[j + 2], mapNormals[j + 3]);
 			if (glm::distance(balls[i].position, tempVertex)
 				<= balls[i].radius) {
-				balls[i].update_positon_map_touch(deltaTime, tempVertex);
+				balls[i].update_positon_map_touch(deltaTime, tempVertex, map_flatness, map_translate_y);
 				touch_map_flag = true;
 				//printf("Should've bounce!\n");
 			}

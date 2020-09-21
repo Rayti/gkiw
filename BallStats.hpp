@@ -18,16 +18,14 @@ public:
 	BallStats(glm::vec3 position);
 	~BallStats();
 	glm::vec3 position;
-	glm::vec3 direction;
+	glm::vec3 speed;
 	float radius;
-	float speed_x;
-	float speed_y;
-	float speed_z;
 	float drop_speed;
-	float speed;
 	float a;
+
+	float timer;
 	void update_position(float deltaTime);
-	void update_positon_map_touch(float deltaTime, glm::vec3 mapVertex);
+	void update_positon_map_touch(float deltaTime, glm::vec3 mapVertex, float flatness, float map_translate_y);
 	void update_positon_ball_collision(float deltaTime,
 		glm::vec3 otherBallVertex,
 		glm::vec3 otherBallDirection);
