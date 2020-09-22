@@ -71,11 +71,12 @@ std::vector <BallStats> balls;
 
 //Map
 float* mapVertices = map.getMapVertices();
-float* mapNormals = map.getMapNormals();
+float* mapNormals = map.getMapVerticesNormals();
 float* mapColors = map.getMapColors();
 float* mapTexCoords = map.getMapTexCoords();
 int mapVertexCount = map.getMapVertexCount();
 float** mapHeight = map.getMapHeights();
+
 
 //Lamp
 float* lampVertices;
@@ -160,12 +161,6 @@ GLuint readTexture(const char* filename) {
 //Procedura inicjująca
 void initOpenGLProgram(GLFWwindow* window) {
 	//************Tutaj umieszczaj kod, który należy wykonać raz, na początku programu************
-	//MK
-	initial_positions.push_back(glm::vec3(4.35f, 5.5f, 4.2f));
-	initial_positions.push_back(glm::vec3(3.35f, 5.5f, -4.6f));
-	initial_positions.push_back(glm::vec3(-3.35f, 5.5f, 3.6f));
-	initial_positions.push_back(glm::vec3(1.35f, 5.5f, -3.6f));
-	//.
 	glClearColor(0,0,0,1);
 	glEnable(GL_DEPTH_TEST);
 	glfwSetWindowSizeCallback(window,windowResizeCallback);
@@ -253,10 +248,6 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 
     glm::mat4 P=glm::perspective(50.0f*PI/180.0f, aspectRatio, 0.01f, 50.0f); //Wylicz macierz rzutowania
 
-    //glm::mat4 M=glm::mat4(1.0f);
-	//M=glm::rotate(M,angle_y,glm::vec3(1.0f,0.0f,0.0f)); //Wylicz macierz modelu
-	//M=glm::rotate(M,angle_x,glm::vec3(0.0f,1.0f,0.0f)); //Wylicz macierz modelu
-	//M = glm::translate(M, glm::vec3(0.0f, 1.0f, -2.5f));
 
     sp->use();//Aktywacja programu cieniującego
     //Przeslij parametry programu cieniującego do karty graficznej
@@ -267,15 +258,19 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 	glm::mat4 M_map = glm::translate(M, glm::vec3(0.0f, map_translate_y, 0.0f));
 	loadModel(M_map, mapVertices, mapColors, mapNormals, mapTexCoords, mapVertexCount, tex0, true);
 
-	float lampScale = 3.0f;
-
-	glm::mat4 lampM = glm::scale(glm::translate(M, glm::vec3(mapSize / 2 - 5, 7, mapSize / 2 - 6)), glm::vec3(lampScale, lampScale, lampScale));
+	float lampScale = 2.0f;
+	glm::mat4 lampM = glm::scale(glm::translate(M, glm::vec3(mapSize / 2, 1, mapSize / 2)),
+		glm::vec3(lampScale, lampScale, lampScale));
 	loadModel(lampM, lampVertices, lampColors, lampNormals, lampTexCoords, lampVertexCount, tex2, false);
 	loadModel(lampM, lightVertices, lightColors, lightNormals, lightTexCoords, lightVertexCount, tex3, false);
 
 
-	//glm::mat4 M = glm::mat4(1.0f);
-	//loadModel(M, vertices, colors, normals, texCoords, vertexCount);
+	glm::mat4 lampM1 = glm::scale(glm::translate(M, glm::vec3(-mapSize / 2, 1, mapSize / 2)),
+		glm::vec3(lampScale, lampScale, lampScale));
+	loadModel(lampM1, lampVertices, lampColors, lampNormals, lampTexCoords, lampVertexCount, tex2, false);
+	loadModel(lampM1, lightVertices, lightColors, lightNormals, lightTexCoords, lightVertexCount, tex3, false);
+
+
 
 	time_meter += deltaTime;
 	if (time_meter >= 0.5f) {
@@ -332,19 +327,30 @@ void drawScene(GLFWwindow* window, float deltaTime) {
 int main(void)
 {
 	float temp_input_x, temp_input_y, temp_input_z;
-	/*for (int i = 0; i < 4; i++) {
-		printf("Podaj wspolrzedne do upuszczenia kulki\nx: ");
-		std::cin >> temp_input_x;
-		printf("\ny: ");
-		std::cin >> temp_input_y;
-		printf("\nz: ");
-		std::cin >> temp_input_z;
-		printf("\n");
-		initial_positions.push_back(glm::vec3(temp_input_x, temp_input_y, temp_input_z));
-		initial_positions[i].x += 0.34f;
-		initial_positions[i].y += 0.34f;
-		initial_positions[i].z += 0.34f;
-	}*/
+	int manual_coords_flag = 0;
+	printf("Jezeli chcesz uzyc domyslnych polozen kulek wpisz 1, w przciwnym razie wpisz 2\n");
+	std::cin >> manual_coords_flag;
+	if (manual_coords_flag != 1) {
+		for (int i = 0; i < 4; i++) {
+			printf("Podaj wspolrzedne do upuszczenia kulki\nx: ");
+			std::cin >> temp_input_x;
+			printf("\ny: ");
+			std::cin >> temp_input_y;
+			printf("\nz: ");
+			std::cin >> temp_input_z;
+			printf("\n");
+			initial_positions.push_back(glm::vec3(temp_input_x, temp_input_y, temp_input_z));
+			initial_positions[i].x += 0.34f;
+			initial_positions[i].y += 0.34f;
+			initial_positions[i].z += 0.34f;
+		}
+	}
+	else {
+		initial_positions.push_back(glm::vec3(4.35f, 5.5f, 4.2f));
+		initial_positions.push_back(glm::vec3(3.35f, 5.5f, -4.6f));
+		initial_positions.push_back(glm::vec3(-3.35f, 5.5f, 3.6f));
+		initial_positions.push_back(glm::vec3(1.35f, 5.5f, -3.6f));
+	}
 	GLFWwindow* window; //Wskaźnik na obiekt reprezentujący okno
 
 	glfwSetErrorCallback(error_callback);//Zarejestruj procedurę obsługi błędów
